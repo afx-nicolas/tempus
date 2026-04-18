@@ -6,6 +6,10 @@ import 'core/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Configure MPV to disable file cache (prevents Linux cache errors)
+  JustAudioMediaKit.bufferSize = 0; // Disable cache
+  
   JustAudioMediaKit.ensureInitialized();
   
   runApp(

@@ -17,10 +17,10 @@ class MetronomeController extends StateNotifier<MetronomeState> {
 
   Future<void> initialize() async {
     if (_isDisposed) return;
-    
+
     try {
       _audioPlayer = AudioPlayer();
-      await _audioPlayer!.setAsset('audio/claves.mp3');
+      await _audioPlayer!.setAsset('assets/audio/tick.wav');
       await _audioPlayer!.setVolume(state.volume / 100.0);
       state = state.copyWith(isInitialized: true);
     } catch (e) {
@@ -32,9 +32,9 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     if (!state.isInitialized) {
       await initialize();
     }
-    
+
     if (_isDisposed) return;
-    
+
     state = state.copyWith(isPlaying: true);
     _currentBeat = 0;
     _startMetronome();
@@ -53,22 +53,22 @@ class MetronomeController extends StateNotifier<MetronomeState> {
 
   void _startMetronome() {
     _stopMetronome();
-    
+
     final interval = Duration(milliseconds: (60000 / state.bpm).round());
-    
+
     _metronomeTimer = Timer.periodic(interval, (timer) async {
       if (_isDisposed) {
         timer.cancel();
         return;
       }
-      
+
       _currentBeat++;
       if (_currentBeat > state.timeSignature) {
         _currentBeat = 1;
       }
-      
+
       state = state.copyWith(currentTick: _currentBeat);
-      
+
       // Play sound on each beat
       await _playSound();
     });
@@ -81,9 +81,10 @@ class MetronomeController extends StateNotifier<MetronomeState> {
 
   Future<void> _playSound() async {
     if (_isDisposed || _audioPlayer == null) return;
-    
+
     try {
-      // Restart from beginning
+      // Stop current playback and restart from beginning
+      await _audioPlayer!.stop();
       await _audioPlayer!.seek(Duration.zero);
       await _audioPlayer!.play();
     } catch (e) {
@@ -95,9 +96,9 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     if (bpm < 30 || bpm > 600) {
       throw ArgumentError('BPM must be between 30 and 600');
     }
-    
+
     state = state.copyWith(bpm: bpm);
-    
+
     // Restart timer if playing with new BPM
     if (state.isPlaying) {
       _startMetronome();
@@ -115,7 +116,7 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     if (volume < 0 || volume > 100) {
       throw ArgumentError('Volume must be between 0 and 100');
     }
-    
+
     await _audioPlayer?.setVolume(volume / 100.0);
     state = state.copyWith(volume: volume);
   }

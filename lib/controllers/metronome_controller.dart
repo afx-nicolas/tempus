@@ -20,7 +20,7 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     
     try {
       _audioPlayer = AudioPlayer();
-      await _audioPlayer!.setAsset('audio/claves.wav');
+      await _audioPlayer!.setAsset('audio/claves.mp3');
       await _audioPlayer!.setVolume(state.volume / 100.0);
       state = state.copyWith(isInitialized: true);
     } catch (e) {

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'core/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Configure MPV to disable file cache (prevents Linux cache errors)
-  JustAudioMediaKit.bufferSize = 0; // Disable cache
-  
-  JustAudioMediaKit.ensureInitialized();
-  
+
+  await SoLoud.instance.init();
+
   runApp(
     const ProviderScope(
       child: TempusApp(),

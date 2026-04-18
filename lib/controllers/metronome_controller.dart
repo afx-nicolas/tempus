@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import '../models/metronome_state.dart';
 
 final metronomeProvider = StateNotifierProvider<MetronomeController, MetronomeState>((ref) {
@@ -8,7 +8,7 @@ final metronomeProvider = StateNotifierProvider<MetronomeController, MetronomeSt
 });
 
 class MetronomeController extends StateNotifier<MetronomeState> {
-  AudioPlayer? _audioPlayer;
+  AudioSource? _tickSound;
   Timer? _metronomeTimer;
   int _currentBeat = 0;
   bool _isDisposed = false;
@@ -19,9 +19,7 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     if (_isDisposed) return;
 
     try {
-      _audioPlayer = AudioPlayer();
-      await _audioPlayer!.setAsset('assets/audio/tick.wav');
-      await _audioPlayer!.setVolume(state.volume / 100.0);
+      _tickSound = await SoLoud.instance.loadAsset('assets/audio/tick.wav');
       state = state.copyWith(isInitialized: true);
     } catch (e) {
       throw Exception('Failed to initialize metronome: $e');
@@ -56,7 +54,7 @@ class MetronomeController extends StateNotifier<MetronomeState> {
 
     final interval = Duration(milliseconds: (60000 / state.bpm).round());
 
-    _metronomeTimer = Timer.periodic(interval, (timer) async {
+    _metronomeTimer = Timer.periodic(interval, (timer) {
       if (_isDisposed) {
         timer.cancel();
         return;
@@ -70,7 +68,7 @@ class MetronomeController extends StateNotifier<MetronomeState> {
       state = state.copyWith(currentTick: _currentBeat);
 
       // Play sound on each beat
-      await _playSound();
+      _playSound();
     });
   }
 
@@ -79,14 +77,11 @@ class MetronomeController extends StateNotifier<MetronomeState> {
     _metronomeTimer = null;
   }
 
-  Future<void> _playSound() async {
-    if (_isDisposed || _audioPlayer == null) return;
+  void _playSound() {
+    if (_isDisposed || _tickSound == null) return;
 
     try {
-      // Stop current playback and restart from beginning
-      await _audioPlayer!.stop();
-      await _audioPlayer!.seek(Duration.zero);
-      await _audioPlayer!.play();
+      SoLoud.instance.play(_tickSound!, volume: state.volume / 100.0);
     } catch (e) {
       // Ignore playback errors
     }
@@ -117,7 +112,6 @@ class MetronomeController extends StateNotifier<MetronomeState> {
       throw ArgumentError('Volume must be between 0 and 100');
     }
 
-    await _audioPlayer?.setVolume(volume / 100.0);
     state = state.copyWith(volume: volume);
   }
 
@@ -125,7 +119,9 @@ class MetronomeController extends StateNotifier<MetronomeState> {
   void dispose() {
     _isDisposed = true;
     _stopMetronome();
-    _audioPlayer?.dispose();
+    if (_tickSound != null) {
+      SoLoud.instance.disposeSource(_tickSound!);
+    }
     super.dispose();
   }
 }

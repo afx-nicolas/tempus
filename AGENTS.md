@@ -17,9 +17,13 @@ Read the skill file for complete SDD workflow guidance.
 ### Workflow
 
 - Every spec should be developed on it's own branch, never commit on main.
-- After spec completion, it should be created a Pull Request on GitHub (Use GitHub CLI, references on `gh-cli` skill).
-- Specs branches should start from `main` branch, always pull before create a new branch
-- Specs branches should only start from another branch if it's related to another spec that has a open pull request.
+- After spec completion, you should push the spec branch and create a Pull Request on GitHub (Use GitHub CLI, references on `gh-cli` skill),
+  then as the user for review.
+- Specs branches should start from `main` branch, always pull before create a new branch.
+- Always check for pending review pull requests, before starting a new spec, if there's comments requesting changes, you should fix and ask for review again,
+  then you continue on the spec development, if the spec you're starting, depends on a pending pull request spec, you **SHOULD NOT** start the spec, ask for the user review
+  and wait the approval of the pull request.
+- If a pull request still open, but it's approved, you're allowed to merge and continue the workflow.
 - Pull requests should include relevant information about what was developed.
 
 ### Stack

@@ -80,7 +80,7 @@ Implement core metronome playback functionality using the `metronome` package.
 - BPM: 120
 - Time signature: 4
 - Volume: 50
-- Sound: default (claves)
+- Sound: default (tick)
 
 **Edge cases**:
 - BPM boundaries (30-600)

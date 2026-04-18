@@ -14,6 +14,14 @@ Read the skill file for complete SDD workflow guidance.
 
 ## Project-Specific Rules
 
+### Workflow
+
+- Every spec should be developed on it's own branch, never commit on main.
+- After spec completion, it should be created a Pull Request on GitHub (Use GitHub CLI, references on `gh-cli` skill).
+- Specs branches should start from `main` branch, always pull before create a new branch
+- Specs branches should only start from another branch if it's related to another spec that has a open pull request.
+- Pull requests should include relevant information about what was developed.
+
 ### Stack
 
 - Material UI
